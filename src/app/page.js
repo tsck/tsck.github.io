@@ -164,7 +164,7 @@ const App = () => {
             for="numOfDataSets"
             style={{ display: "inline-block", width: "250px" }}
           >
-            Number of datasets:
+            Number of datasets per chart:
           </label>
           <input
             type="text"
