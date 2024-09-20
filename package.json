@@ -11,8 +11,12 @@
   "dependencies": {
     "@visx/responsive": "^3.10.2",
     "@visx/xychart": "^3.11.0",
+    "chart.js": "^4.4.4",
+    "chartjs-adapter-date-fns": "^3.0.0",
+    "echarts": "^5.5.1",
     "next": "14.2.12",
     "react": "^18",
+    "react-chartjs-2": "^5.2.0",
     "react-dom": "^18"
   },
   "devDependencies": {
