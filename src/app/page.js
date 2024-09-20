@@ -221,7 +221,7 @@ const App = () => {
       </form>
 
       {Array.from({ length: numOfCharts }, (_, i) =>
-        libOptions[lib].render({ datasets, key: i })
+        libOptions[lib].render({ datasets, key: i, group: "chartGroup" })
       )}
     </div>
   );

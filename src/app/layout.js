@@ -1,4 +1,3 @@
-import { Suspense } from "react";
 import localFont from "next/font/local";
 import "./globals.css";
 
@@ -23,9 +22,7 @@ export default function RootLayout({ children }) {
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
         <div class="container">
-          <div class="content">
-            <Suspense>{children}</Suspense>
-          </div>
+          <div class="content">{children}</div>
         </div>
       </body>
     </html>

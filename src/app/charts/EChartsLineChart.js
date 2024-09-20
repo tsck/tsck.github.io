@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from "react";
 import * as echarts from "echarts";
 
-const EchartsLineChart = ({ datasets }) => {
+const EchartsLineChart = ({ datasets, group }) => {
   const chartRef = useRef(null);
 
   useEffect(() => {
@@ -20,6 +20,13 @@ const EchartsLineChart = ({ datasets }) => {
     }));
 
     const option = {
+      // toolbox: {
+      //   feature: {
+      //     dataZoom: {},
+      //     restore: {},
+      //   },
+      //   right: "20px",
+      // },
       tooltip: {
         trigger: "axis",
         backgroundColor: "rgb(50, 50, 50)", // Set solid background color
@@ -44,19 +51,31 @@ const EchartsLineChart = ({ datasets }) => {
       grid: {
         left: "20px",
         right: "20px",
-        top: "20px",
+        top: "50px",
         bottom: "20px",
         containLabel: true,
+        show: true,
       },
       series,
     };
 
     chartInstance.setOption(option);
 
+    // if (group) {
+    //   chartInstance.group = group;
+    //   echarts.connect(group);
+    // }
+
+    // chartInstance.on("dataZoom", (params) => {
+    //   const { startValue: xStart, endValue: xEnd } = params.batch[0];
+    //   const { startValue: yStart, endValue: yEnd } = params.batch[1];
+    //   // Handle updated zoom values
+    // });
+
     return () => {
       chartInstance.dispose();
     };
-  }, [datasets]);
+  }, [datasets, group]);
 
   return (
     <div
