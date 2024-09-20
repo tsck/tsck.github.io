@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import VisxLineChart from "./charts/VisxLineChart";
 import EchartsLineChart from "./charts/EChartsLineChart";
 import ChartJSLineChart from "./charts/ChartJSLineChart";
@@ -31,7 +31,9 @@ function debounce(func, wait) {
 }
 
 const App = () => {
+  const router = useRouter();
   const searchParams = useSearchParams();
+  const pathname = usePathname();
 
   const queryNumOfCharts = searchParams.get("numOfCharts");
   const queryNumOfDataSets = searchParams.get("numOfDataSets");
@@ -56,9 +58,25 @@ const App = () => {
     setDatasets(generateData({ numOfDataSets, numOfDaysPerSet }));
   }, [numOfCharts, numOfDataSets, numOfDaysPerSet]);
 
-  const handleConfigChange = debounce((value, setter) => {
+  const updateQueryParams = (key, value) => {
+    const params = new URLSearchParams(searchParams);
+    if (value) {
+      params.set(key, value);
+    } else {
+      params.delete(key);
+    }
+    router.push(`${pathname}?${params.toString()}`);
+  };
+
+  const handleConfigChange = debounce((value, setter, queryParam) => {
     setter(Number(value));
+    updateQueryParams(queryParam, value);
   }, 500); // 500ms delay
+
+  const handleLibChange = (value) => {
+    setLib(value);
+    updateQueryParams("lib", value);
+  };
 
   const charts = [];
 
@@ -89,9 +107,9 @@ const App = () => {
                 name="lib"
                 value="visx"
                 checked={lib === "visx"}
-                onChange={(e) => setLib(e.target.value)}
+                onChange={(e) => handleLibChange(e.target.value)}
               />
-              <label htmlFor="visx">Visx</label>
+              <label htmlFor="visx">Visx (SVG - via D3)</label>
             </div>
             <div style={{ marginBottom: "5px" }}>
               <input
@@ -100,9 +118,9 @@ const App = () => {
                 name="lib"
                 value="echarts"
                 checked={lib === "echarts"}
-                onChange={(e) => setLib(e.target.value)}
+                onChange={(e) => handleLibChange(e.target.value)}
               />
-              <label htmlFor="echarts">Echarts</label>
+              <label htmlFor="echarts">Echarts (canvas)</label>
             </div>
             <div style={{ marginBottom: "5px" }}>
               <input
@@ -111,9 +129,9 @@ const App = () => {
                 name="lib"
                 value="chartjs"
                 checked={lib === "chartjs"}
-                onChange={(e) => setLib(e.target.value)}
+                onChange={(e) => handleLibChange(e.target.value)}
               />
-              <label htmlFor="chartjs">Chart.js</label>
+              <label htmlFor="chartjs">Chart.js (canvas)</label>
             </div>
           </fieldset>
         </div>
@@ -130,7 +148,11 @@ const App = () => {
             pattern="[0-9]*"
             defaultValue={numOfCharts}
             onChange={(e) =>
-              handleConfigChange(e.currentTarget.value, setNumOfCharts)
+              handleConfigChange(
+                e.currentTarget.value,
+                setNumOfCharts,
+                "numOfCharts"
+              )
             }
             style={{ width: "50px" }}
             id="numOfCharts"
@@ -149,7 +171,11 @@ const App = () => {
             pattern="[0-9]*"
             defaultValue={numOfDataSets}
             onChange={(e) =>
-              handleConfigChange(e.currentTarget.value, setNumOfDataSets)
+              handleConfigChange(
+                e.currentTarget.value,
+                setNumOfDataSets,
+                "numOfDataSets"
+              )
             }
             style={{ width: "50px" }}
             id="numOfDataSets"
@@ -168,7 +194,11 @@ const App = () => {
             pattern="[0-9]*"
             defaultValue={numOfDaysPerSet}
             onChange={(e) =>
-              handleConfigChange(e.currentTarget.value, setNumOfDaysPerSet)
+              handleConfigChange(
+                e.currentTarget.value,
+                setNumOfDaysPerSet,
+                "numOfDaysPerSet"
+              )
             }
             style={{ width: "50px" }}
             id="numOfDaysPerSet"
