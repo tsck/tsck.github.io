@@ -49,7 +49,7 @@ const App = () => {
     queryNumOfCharts ? Number(queryNumOfCharts) : 100
   );
   const [numOfDataSets, setNumOfDataSets] = useState(
-    queryNumOfDataSets ? Number(queryNumOfDataSets) : 100
+    queryNumOfDataSets ? Number(queryNumOfDataSets) : 20
   );
   const [numOfDaysPerSet, setNumOfDaysPerSet] = useState(
     queryNumOfDaysPerSet ? Number(queryNumOfDaysPerSet) : 90
@@ -103,8 +103,8 @@ const App = () => {
         onSubmit={(e) => e.preventDefault()}
       >
         <div>
-          <fieldset style={{ border: 0, padding: "10px 0 40px" }}>
-            <legend>Chart Library: (will take time on click, at scale)</legend>
+          <fieldset style={{ border: 0, padding: "10px 0 32px" }}>
+            <legend>Chart Library (can take time on click, at scale):</legend>
             <div style={{ marginBottom: "10px" }}>
               <input
                 type="radio"
@@ -114,7 +114,9 @@ const App = () => {
                 checked={lib === "visx"}
                 onChange={(e) => handleLibChange(e.target.value)}
               />
-              <label htmlFor="visx">Visx (SVG - via D3)</label>
+              <label htmlFor="visx" style={{ marginLeft: "5px" }}>
+                Visx (SVG - via D3)
+              </label>
             </div>
             <div style={{ marginBottom: "10px" }}>
               <input
@@ -125,7 +127,9 @@ const App = () => {
                 checked={lib === "echarts"}
                 onChange={(e) => handleLibChange(e.target.value)}
               />
-              <label htmlFor="echarts">Echarts (canvas)</label>
+              <label htmlFor="echarts" style={{ marginLeft: "5px" }}>
+                Echarts (canvas)
+              </label>
             </div>
             <div style={{ marginBottom: "10px" }}>
               <input
@@ -136,8 +140,8 @@ const App = () => {
                 checked={lib === "chartjs"}
                 onChange={(e) => handleLibChange(e.target.value)}
               />
-              <label htmlFor="chartjs">
-                Chart.js (canvas) (Will probably crash the browser at scale)
+              <label htmlFor="chartjs" style={{ marginLeft: "5px" }}>
+                Chart.js (canvas) (Might crash your browser at scale)
               </label>
             </div>
           </fieldset>
@@ -211,8 +215,8 @@ const App = () => {
             id="numOfDaysPerSet"
           />
         </div>
-        <div style={{ marginTop: "40px" }}>
-          <p style={{ marginBottom: "5px" }}>
+        <div style={{ marginTop: "32px" }}>
+          <p style={{ marginBottom: "8px" }}>
             <span style={{ display: "inline-block", width: "250px" }}>
               Total Lines:
             </span>
