@@ -115,9 +115,8 @@ const App = () => {
           <fieldset style={{ border: 0, padding: "10px 0 32px" }}>
             <legend>Chart Library (can take time on click, at scale):</legend>
             {Object.entries(libOptions).map(([id, { label }]) => {
-              console.log(id, label);
               return (
-                <div style={{ marginBottom: "10px" }}>
+                <div key={id} style={{ marginBottom: "10px" }}>
                   <input
                     type="radio"
                     id={id}
