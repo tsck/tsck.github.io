@@ -12,7 +12,8 @@ const VisxLineChart = ({ datasets }) => {
           xScale={{ type: "time" }}
           yScale={{ type: "linear" }}
         >
-          <Grid />
+          <Grid rows={true} columns={false} />{" "}
+          {/* Only show horizontal grid lines */}
           <Axis orientation="bottom" />
           <Axis orientation="left" />
           {datasets.map((dataset) => (
