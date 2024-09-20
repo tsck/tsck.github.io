@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import VisxLineChart from "./charts/VisxLineChart";
 import EchartsLineChart from "./charts/EChartsLineChart";
 import ChartJSLineChart from "./charts/ChartJSLineChart";
@@ -30,13 +31,26 @@ function debounce(func, wait) {
 }
 
 const App = () => {
-  const [numOfCharts, setNumOfCharts] = useState(100);
-  const [numOfDataSets, setNumOfDataSets] = useState(10);
-  const [numOfDaysPerSet, setNumOfDaysPerSet] = useState(90);
+  const searchParams = useSearchParams();
+
+  const queryNumOfCharts = searchParams.get("numOfCharts");
+  const queryNumOfDataSets = searchParams.get("numOfDataSets");
+  const queryNumOfDaysPerSet = searchParams.get("numOfDaysPerSet");
+  const queryLib = searchParams.get("lib");
+
+  const [numOfCharts, setNumOfCharts] = useState(
+    queryNumOfCharts ? Number(queryNumOfCharts) : 100
+  );
+  const [numOfDataSets, setNumOfDataSets] = useState(
+    queryNumOfDataSets ? Number(queryNumOfDataSets) : 10
+  );
+  const [numOfDaysPerSet, setNumOfDaysPerSet] = useState(
+    queryNumOfDaysPerSet ? Number(queryNumOfDaysPerSet) : 90
+  );
+  const [lib, setLib] = useState(queryLib || "visx");
   const [datasets, setDatasets] = useState(
     generateData({ numOfDataSets, numOfDaysPerSet })
   );
-  const [lib, setLib] = useState("visx");
 
   useEffect(() => {
     setDatasets(generateData({ numOfDataSets, numOfDaysPerSet }));
@@ -60,89 +74,105 @@ const App = () => {
 
   return (
     <div>
-      <h1 style={{ padding: "0 20px" }}>Chart Performance Comparison</h1>
-      <form style={{ padding: "0 20px" }} onSubmit={(e) => e.preventDefault()}>
+      <h1 style={{ padding: "40px" }}>Chart Performance Comparison</h1>
+      <form
+        style={{ padding: "0 40px 40px", borderBottom: "1px solid white" }}
+        onSubmit={(e) => e.preventDefault()}
+      >
         <div>
-          <fieldset style={{ margin: "20px 0", border: 0, padding: "10px 0" }}>
+          <fieldset style={{ border: 0, padding: "10px 0 40px" }}>
             <legend>Chart Library:</legend>
             <div style={{ marginBottom: "5px" }}>
               <input
                 type="radio"
                 id="visx"
-                name="drone"
+                name="lib"
                 value="visx"
                 checked={lib === "visx"}
-                onChange={() => setLib("visx")}
-                style={{ marginRight: "5px" }}
+                onChange={(e) => setLib(e.target.value)}
               />
-              <label for="visx">Visx (SVG)</label>
-            </div>
-            <div style={{ marginBottom: "5px" }}>
-              <input
-                type="radio"
-                id="chartjs"
-                name="drone"
-                value="chartjs"
-                checked={lib === "chartjs"}
-                onChange={() => setLib("chartjs")}
-                style={{ marginRight: "5px" }}
-              />
-              <label for="chartjs">Chart.js (canvas)</label>
+              <label htmlFor="visx">Visx</label>
             </div>
             <div style={{ marginBottom: "5px" }}>
               <input
                 type="radio"
                 id="echarts"
-                name="drone"
+                name="lib"
                 value="echarts"
                 checked={lib === "echarts"}
-                onChange={() => setLib("echarts")}
-                style={{ marginRight: "5px" }}
+                onChange={(e) => setLib(e.target.value)}
               />
-              <label for="echarts">ECharts (canvas)</label>
+              <label htmlFor="echarts">Echarts</label>
+            </div>
+            <div style={{ marginBottom: "5px" }}>
+              <input
+                type="radio"
+                id="chartjs"
+                name="lib"
+                value="chartjs"
+                checked={lib === "chartjs"}
+                onChange={(e) => setLib(e.target.value)}
+              />
+              <label htmlFor="chartjs">Chart.js</label>
             </div>
           </fieldset>
         </div>
-        <div>
-          <label>
+        <div style={{ marginBottom: "5px" }}>
+          <label
+            for="numOfCharts"
+            style={{ display: "inline-block", width: "250px" }}
+          >
             Number of charts:
-            <input
-              type="text"
-              inputmode="numeric"
-              pattern="[0-9]*"
-              value={numOfCharts}
-              onChange={(e) =>
-                handleConfigChange(e.currentTarget.value, setNumOfCharts)
-              }
-              style={{ margin: "0 30px 0 10px" }}
-            />
           </label>
-          <label>
+          <input
+            type="text"
+            inputmode="numeric"
+            pattern="[0-9]*"
+            defaultValue={numOfCharts}
+            onChange={(e) =>
+              handleConfigChange(e.currentTarget.value, setNumOfCharts)
+            }
+            style={{ width: "50px" }}
+            id="numOfCharts"
+          />
+        </div>
+        <div style={{ marginBottom: "5px" }}>
+          <label
+            for="numOfDataSets"
+            style={{ display: "inline-block", width: "250px" }}
+          >
             Number of datasets:
-            <input
-              type="text"
-              inputmode="numeric"
-              pattern="[0-9]*"
-              value={numOfDataSets}
-              onChange={(e) =>
-                handleConfigChange(e.currentTarget.value, setNumOfDataSets)
-              }
-              style={{ margin: "0 30px 0 10px" }}
-            />
           </label>
-          <label>
+          <input
+            type="text"
+            inputmode="numeric"
+            pattern="[0-9]*"
+            defaultValue={numOfDataSets}
+            onChange={(e) =>
+              handleConfigChange(e.currentTarget.value, setNumOfDataSets)
+            }
+            style={{ width: "50px" }}
+            id="numOfDataSets"
+          />
+        </div>
+        <div style={{ marginBottom: "5px" }}>
+          <label
+            for="numOfDaysPerSet"
+            style={{ display: "inline-block", width: "250px" }}
+          >
             Number of days per dataset:
-            <input
-              type="text"
-              inputmode="numeric"
-              pattern="[0-9]*"
-              value={numOfDaysPerSet}
-              onChange={(e) =>
-                handleConfigChange(e.currentTarget.value, setNumOfDaysPerSet)
-              }
-              style={{ margin: "0 30px 0 10px" }}
-            />
           </label>
+          <input
+            type="text"
+            inputmode="numeric"
+            pattern="[0-9]*"
+            defaultValue={numOfDaysPerSet}
+            onChange={(e) =>
+              handleConfigChange(e.currentTarget.value, setNumOfDaysPerSet)
+            }
+            style={{ width: "50px" }}
+            id="numOfDaysPerSet"
+          />
         </div>
       </form>
       {charts}
