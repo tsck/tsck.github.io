@@ -6,6 +6,7 @@ import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import VisxLineChart from "./charts/VisxLineChart";
 import EchartsLineChart from "./charts/EChartsLineChart";
 import ChartJSLineChart from "./charts/ChartJSLineChart";
+import D3LineChart from "./charts/D3LineChart";
 
 const generateData = ({ numOfDataSets, numOfDaysPerSet }) => {
   const datasets = [];
@@ -55,9 +56,29 @@ const App = () => {
     queryNumOfDaysPerSet ? Number(queryNumOfDaysPerSet) : 90
   );
   const [lib, setLib] = useState(queryLib || "visx");
+
   const [datasets, setDatasets] = useState(
     generateData({ numOfDataSets, numOfDaysPerSet })
   );
+
+  const libOptions = {
+    visx: {
+      label: "Visx (SVG)",
+      render: (props) => <VisxLineChart {...props} />,
+    },
+    echarts: {
+      label: "ECharts (canvas)",
+      render: (props) => <EchartsLineChart {...props} />,
+    },
+    chartjs: {
+      label: "Chart.js (canvas) (might crash browser at scale)",
+      render: (props) => <ChartJSLineChart {...props} />,
+    },
+    d3: {
+      label: "D3 (canvas) (WIP)",
+      render: (props) => <D3LineChart {...props} />,
+    },
+  };
 
   useEffect(() => {
     setDatasets(generateData({ numOfDataSets, numOfDaysPerSet }));
@@ -83,18 +104,6 @@ const App = () => {
     setLib(value);
   };
 
-  const charts = [];
-
-  for (let i = 0; i < numOfCharts; i++) {
-    if (lib === "echarts") {
-      charts.push(<EchartsLineChart key={i} datasets={datasets} />);
-    } else if (lib === "chartjs") {
-      charts.push(<ChartJSLineChart key={i} datasets={datasets} />);
-    } else {
-      charts.push(<VisxLineChart key={i} datasets={datasets} />);
-    }
-  }
-
   return (
     <div>
       <h1 style={{ padding: "40px" }}>Chart Performance Comparison</h1>
@@ -105,45 +114,24 @@ const App = () => {
         <div>
           <fieldset style={{ border: 0, padding: "10px 0 32px" }}>
             <legend>Chart Library (can take time on click, at scale):</legend>
-            <div style={{ marginBottom: "10px" }}>
-              <input
-                type="radio"
-                id="visx"
-                name="lib"
-                value="visx"
-                checked={lib === "visx"}
-                onChange={(e) => handleLibChange(e.target.value)}
-              />
-              <label htmlFor="visx" style={{ marginLeft: "5px" }}>
-                Visx (SVG - via D3)
-              </label>
-            </div>
-            <div style={{ marginBottom: "10px" }}>
-              <input
-                type="radio"
-                id="echarts"
-                name="lib"
-                value="echarts"
-                checked={lib === "echarts"}
-                onChange={(e) => handleLibChange(e.target.value)}
-              />
-              <label htmlFor="echarts" style={{ marginLeft: "5px" }}>
-                Echarts (canvas)
-              </label>
-            </div>
-            <div style={{ marginBottom: "10px" }}>
-              <input
-                type="radio"
-                id="chartjs"
-                name="lib"
-                value="chartjs"
-                checked={lib === "chartjs"}
-                onChange={(e) => handleLibChange(e.target.value)}
-              />
-              <label htmlFor="chartjs" style={{ marginLeft: "5px" }}>
-                Chart.js (canvas) (Might crash your browser at scale)
-              </label>
-            </div>
+            {Object.entries(libOptions).map(([id, { label }]) => {
+              console.log(id, label);
+              return (
+                <div style={{ marginBottom: "10px" }}>
+                  <input
+                    type="radio"
+                    id={id}
+                    name="lib"
+                    value={id}
+                    checked={lib === id}
+                    onChange={(e) => handleLibChange(e.target.value)}
+                  />
+                  <label htmlFor={id} style={{ marginLeft: "5px" }}>
+                    {label}
+                  </label>
+                </div>
+              );
+            })}
           </fieldset>
         </div>
         <div style={{ marginBottom: "5px" }}>
@@ -233,7 +221,9 @@ const App = () => {
         </div>
       </form>
 
-      {charts}
+      {Array.from({ length: numOfCharts }, (_, i) =>
+        libOptions[lib].render({ datasets, key: i })
+      )}
     </div>
   );
 };
