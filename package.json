@@ -9,9 +9,11 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@visx/responsive": "^3.10.2",
+    "@visx/xychart": "^3.11.0",
+    "next": "14.2.12",
     "react": "^18",
-    "react-dom": "^18",
-    "next": "14.2.12"
+    "react-dom": "^18"
   },
   "devDependencies": {
     "eslint": "^8",
