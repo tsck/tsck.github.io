@@ -12,13 +12,21 @@ const EchartsLineChart = ({ datasets }) => {
       type: "line",
       data: dataset.data.map((d) => [d.x, d.y]),
       symbol: "none", // Remove circles for each point
+      animation: false,
+      triggerLineEvernt: false,
+      emphasis: {
+        disabled: true,
+      },
     }));
 
     const option = {
       tooltip: {
         trigger: "axis",
-        backgroundColor: "rgba(50, 50, 50, 0.8)", // Set solid background color
+        backgroundColor: "rgb(50, 50, 50)", // Set solid background color
         transitionDuration: 0, // Prevent transparency when moving
+        textStyle: {
+          color: "#fff", // Ensure text is visible on dark background
+        },
         formatter: (params) => {
           const date = new Date(params[0].data[0]).toDateString();
           const values = params

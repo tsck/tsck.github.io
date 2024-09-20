@@ -31,6 +31,10 @@ function debounce(func, wait) {
   };
 }
 
+function numberWithCommas(x) {
+  return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+}
+
 const App = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -45,7 +49,7 @@ const App = () => {
     queryNumOfCharts ? Number(queryNumOfCharts) : 100
   );
   const [numOfDataSets, setNumOfDataSets] = useState(
-    queryNumOfDataSets ? Number(queryNumOfDataSets) : 10
+    queryNumOfDataSets ? Number(queryNumOfDataSets) : 100
   );
   const [numOfDaysPerSet, setNumOfDaysPerSet] = useState(
     queryNumOfDaysPerSet ? Number(queryNumOfDaysPerSet) : 90
@@ -70,13 +74,13 @@ const App = () => {
   };
 
   const handleConfigChange = debounce((value, setter, queryParam) => {
-    setter(Number(value));
     updateQueryParams(queryParam, value);
+    setter(Number(value));
   }, 500); // 500ms delay
 
   const handleLibChange = (value) => {
-    setLib(value);
     updateQueryParams("lib", value);
+    setLib(value);
   };
 
   const charts = [];
@@ -100,8 +104,8 @@ const App = () => {
       >
         <div>
           <fieldset style={{ border: 0, padding: "10px 0 40px" }}>
-            <legend>Chart Library:</legend>
-            <div style={{ marginBottom: "5px" }}>
+            <legend>Chart Library: (will take time on click, at scale)</legend>
+            <div style={{ marginBottom: "10px" }}>
               <input
                 type="radio"
                 id="visx"
@@ -112,7 +116,7 @@ const App = () => {
               />
               <label htmlFor="visx">Visx (SVG - via D3)</label>
             </div>
-            <div style={{ marginBottom: "5px" }}>
+            <div style={{ marginBottom: "10px" }}>
               <input
                 type="radio"
                 id="echarts"
@@ -123,7 +127,7 @@ const App = () => {
               />
               <label htmlFor="echarts">Echarts (canvas)</label>
             </div>
-            <div style={{ marginBottom: "5px" }}>
+            <div style={{ marginBottom: "10px" }}>
               <input
                 type="radio"
                 id="chartjs"
@@ -132,7 +136,9 @@ const App = () => {
                 checked={lib === "chartjs"}
                 onChange={(e) => handleLibChange(e.target.value)}
               />
-              <label htmlFor="chartjs">Chart.js (canvas)</label>
+              <label htmlFor="chartjs">
+                Chart.js (canvas) (Will probably crash the browser at scale)
+              </label>
             </div>
           </fieldset>
         </div>
@@ -205,7 +211,24 @@ const App = () => {
             id="numOfDaysPerSet"
           />
         </div>
+        <div style={{ marginTop: "40px" }}>
+          <p style={{ marginBottom: "5px" }}>
+            <span style={{ display: "inline-block", width: "250px" }}>
+              Total Lines:
+            </span>
+            <span>{numberWithCommas(numOfCharts * numOfDataSets)}</span>
+          </p>
+          <p style={{ marginBottom: "5px" }}>
+            <span style={{ display: "inline-block", width: "250px" }}>
+              Total Points:
+            </span>
+            <span>
+              {numberWithCommas(numOfCharts * numOfDataSets * numOfDaysPerSet)}
+            </span>
+          </p>
+        </div>
       </form>
+
       {charts}
     </div>
   );
