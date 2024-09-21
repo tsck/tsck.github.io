@@ -125,14 +125,41 @@ table {
   border-spacing: 0;
 }
 
-/* Custom styles */
+/* Custom styles -------------------------------------------------------------- */
+@font-face {
+  font-family: "Euclid Circular A"; /* Give the font a unique name */
+  src: url("../fonts/euclid-circular-a-regular.ttf") format("truetype"); /* Specify the font file and its format */
+}
+@font-face {
+  font-family: "Euclid Circular A Light"; /* Give the font a unique name */
+  src: url("../fonts/euclid-circular-a-light.ttf") format("truetype"); /* Specify the font file and its format */
+}
+
 html,
 body {
   overflow: auto;
-  background: rgba(0, 0, 0, 0.9);
+  /* background: rgba(0, 0, 0, 0.9); */
   box-sizing: border-box;
-  color: white;
-  font-family: var(--font-geist-sans);
+}
+
+html,
+body,
+p,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+a,
+input {
+  color: #5c6c75;
+  font-family: "Euclid Circular A";
+  font-size: 16px;
+}
+
+input {
+  border: 1px solid #5c6c75;
 }
 
 .container {

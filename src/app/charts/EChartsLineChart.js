@@ -13,7 +13,7 @@ const EchartsLineChart = ({ datasets, group }) => {
       data: dataset.data.map((d) => [d.x, d.y]),
       symbol: "none", // Remove circles for each point
       animation: false,
-      triggerLineEvernt: false,
+      triggerLineEvent: false,
       emphasis: {
         disabled: true,
       },

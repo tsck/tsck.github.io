@@ -9,6 +9,18 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@babel/preset-react": "^7.24.7",
+    "@emotion/babel-plugin": "^11.12.0",
+    "@emotion/cache": "^11.13.1",
+    "@emotion/core": "^11.0.0",
+    "@emotion/react": "^11.13.3",
+    "@emotion/server": "^11.11.0",
+    "@emotion/styled": "^11.13.0",
+    "@leafygreen-ui/number-input": "^2.2.1",
+    "@leafygreen-ui/palette": "^4.1.1",
+    "@leafygreen-ui/text-input": "^13.1.1",
+    "@leafygreen-ui/tokens": "^2.11.0",
+    "@leafygreen-ui/typography": "^19.3.0",
     "@visx/responsive": "^3.10.2",
     "@visx/xychart": "^3.11.0",
     "chart.js": "^4.4.4",
