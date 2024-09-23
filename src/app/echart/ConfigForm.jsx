@@ -45,7 +45,6 @@ const ConfigForm = () => {
   );
 
   const updateQueryParams = (newParams) => {
-    debugger;
     const params = new URLSearchParams(searchParams);
     for (const [key, value] of newParams) {
       if (value) {

@@ -45,6 +45,8 @@ const Chart = ({ data, group, label }) => {
   }, [searchParams]);
 
   useEffect(() => {
+    if (!data) return;
+
     const chartInstance = echarts.init(chartRef.current);
 
     const series = data.map((dataset, index) => ({
