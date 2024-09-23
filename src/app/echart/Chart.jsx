@@ -3,7 +3,7 @@ import { renderToString } from "react-dom/server";
 
 import * as echarts from "echarts";
 import { palette } from "@leafygreen-ui/palette";
-import { borderRadius } from "@leafygreen-ui/tokens";
+import { borderRadius, spacing } from "@leafygreen-ui/tokens";
 import ToolTip from "./Tooltip";
 import { useSearchParams } from "next/navigation";
 
@@ -62,6 +62,45 @@ const Chart = ({ data, group, label }) => {
         symbol: "circle",
         symbolSize: 1,
       },
+      clip: false,
+      markLine: {
+        data: [
+          {
+            yAxis: 600,
+            label: {
+              formatter: ``,
+            },
+            emphasis: {
+              label: {
+                formatter: `Max Storage Limit`,
+              },
+            },
+          },
+        ],
+        lineStyle: {
+          color: "red",
+          type: "dashed",
+          width: 1,
+        },
+        label: {
+          position: "insideEndBottom",
+          distance: [-16, 10],
+        },
+        emphasis: {
+          label: {
+            backgroundColor: "#001E2B",
+            borderRadius: borderRadius[150],
+            color: "white",
+            padding: spacing[400],
+          },
+          lineStyle: {
+            width: 1,
+          },
+        },
+        symbol: ["none", "triangle"],
+        symbolSize: 12,
+        symbolRotate: 90,
+      },
     }));
 
     const option = {
@@ -95,7 +134,7 @@ const Chart = ({ data, group, label }) => {
         splitLine: { show: true },
         axisLine: {
           lineStyle: {
-            color: "#e0e0e0",
+            color: palette.gray.light2,
           },
         },
         axisLabel: {
@@ -114,7 +153,7 @@ const Chart = ({ data, group, label }) => {
         splitLine: { show: true },
         axisLine: {
           lineStyle: {
-            color: "#e0e0e0",
+            color: palette.gray.light2,
           },
         },
         axisLabel: {
@@ -127,10 +166,10 @@ const Chart = ({ data, group, label }) => {
         },
       },
       grid: {
-        left: "20px",
-        right: "20px",
-        top: "64px",
-        bottom: "20px",
+        left: spacing[1000],
+        right: spacing[500],
+        top: spacing[1600],
+        bottom: spacing[500],
         containLabel: true,
         show: true,
       },
