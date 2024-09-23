@@ -102,7 +102,6 @@ const ConfigForm = () => {
         label="End"
         value={endDate}
         onChange={(newDate) => {
-          console.log(newDate.toISOString());
           updateQueryParams([["endDate", newDate.toISOString()]]);
           setEndDate(newDate);
         }}

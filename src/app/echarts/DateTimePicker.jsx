@@ -10,8 +10,6 @@ import { palette } from "@leafygreen-ui/palette";
 import { css } from "@emotion/react";
 import { Label } from "@leafygreen-ui/typography";
 
-console.log(spacing);
-
 const dateTimeStyles = css`
   display: grid;
   grid-template-columns: repeat(4, 1fr);

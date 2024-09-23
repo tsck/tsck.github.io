@@ -5,22 +5,7 @@ import * as echarts from "echarts";
 import { palette } from "@leafygreen-ui/palette";
 import { borderRadius } from "@leafygreen-ui/tokens";
 import ToolTip from "./Tooltip";
-import { generateDatasets } from "./utils";
 import { useSearchParams } from "next/navigation";
-
-// function getDatasets(granularityInMinutes) {
-//   const datasetCount = 4;
-//   const now = new Date();
-//   const threeDaysAgo = new Date();
-//   threeDaysAgo.setDate(now.getDate() - 3);
-
-//   return generateDatasets(
-//     datasetCount,
-//     granularityInMinutes,
-//     threeDaysAgo,
-//     now
-//   );
-// }
 
 const colors = [
   "#016BF8",
@@ -40,7 +25,7 @@ const colors = [
   "#B45AF2",
 ];
 
-const Chart = ({ data, group }) => {
+const Chart = ({ data, group, label }) => {
   const searchParams = useSearchParams();
   const chartRef = useRef(null);
   const [startDate, setStartDate] = useState(
@@ -80,7 +65,7 @@ const Chart = ({ data, group }) => {
     const option = {
       title: {
         show: true,
-        text: "Echarts Line Chart",
+        text: label,
         padding: 20,
         textStyle: {
           color: palette.black,

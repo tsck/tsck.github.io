@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 
 import Chart from "./Chart";
@@ -32,7 +32,6 @@ const App = () => {
   const numOfCharts = 10;
 
   useEffect(() => {
-    console.log("granularity", searchParams.get("granularity"));
     setGranularity(Number(searchParams.get("granularity")));
   }, [searchParams]);
 
@@ -41,7 +40,12 @@ const App = () => {
       <H1 style={{ padding: "40px" }}>LeafyGreen Charts Demo</H1>
       <ConfigForm />
       {Array.from({ length: numOfCharts }, (_, i) => (
-        <Chart key={i} group="chartGroup" data={getDatasets(granularity)} />
+        <Chart
+          key={i}
+          group="chartGroup"
+          data={getDatasets(granularity)}
+          label={"Chart " + (i + 1)}
+        />
       ))}
     </div>
   );
