@@ -31,7 +31,7 @@ const App = () => {
 
   const [datasets, setDatasets] = useState([]);
 
-  const numOfCharts = 1;
+  const numOfCharts = 10;
 
   useEffect(() => {
     (async () => {
@@ -49,7 +49,7 @@ const App = () => {
 
   return (
     <div>
-      <H1 style={{ padding: "40px" }}>LeafyGreen Charts Demo</H1>
+      <H1 style={{ padding: "40px" }}>ECharts Demo</H1>
       <ConfigForm />
       {Array.from({ length: numOfCharts }, (_, i) => (
         <Chart

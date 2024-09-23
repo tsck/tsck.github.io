@@ -8,6 +8,7 @@ import EchartsLineChart from "./charts/EChartsLineChart";
 import ChartJSLineChart from "./charts/ChartJSLineChart";
 import D3LineChart from "./charts/D3LineChart";
 import { H1 } from "@leafygreen-ui/typography";
+import Link from "next/link";
 
 const generateData = ({ numOfDataSets, numOfPointsPerSet }) => {
   const datasets = [];
@@ -68,7 +69,12 @@ const App = () => {
       render: (props) => <VisxLineChart {...props} />,
     },
     echarts: {
-      label: "ECharts (canvas)",
+      label: (
+        <>
+          ECharts (canvas) -{" "}
+          <Link href="/echart?granularity=1">CLICK HERE FOR STYLED DEMO</Link>
+        </>
+      ),
       render: (props) => <EchartsLineChart {...props} />,
     },
     chartjs: {

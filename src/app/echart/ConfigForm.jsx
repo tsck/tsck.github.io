@@ -44,7 +44,7 @@ const ConfigForm = () => {
       : currentDate
   );
 
-  const updateQueryParams = (newParams) => {
+  const updateQueryParams = (newParams, toReplace) => {
     const params = new URLSearchParams(searchParams);
     for (const [key, value] of newParams) {
       if (value) {
@@ -53,7 +53,11 @@ const ConfigForm = () => {
         params.delete(key);
       }
     }
-    router.push(`${pathname}?${params.toString()}`);
+    if (toReplace) {
+      router.replace(`${pathname}?${params.toString()}`);
+    } else {
+      router.push(`${pathname}?${params.toString()}`);
+    }
   };
 
   const handleConfigChange = debounce((value, setter, queryParam) => {
@@ -62,11 +66,14 @@ const ConfigForm = () => {
   }, 500);
 
   useEffect(() => {
-    updateQueryParams([
-      ["granularity", granularity],
-      ["startDate", startDate.toISOString()],
-      ["endDate", endDate.toISOString()],
-    ]);
+    updateQueryParams(
+      [
+        ["granularity", granularity],
+        ["startDate", startDate.toISOString()],
+        ["endDate", endDate.toISOString()],
+      ],
+      true
+    );
   }, []);
 
   return (
