@@ -57,7 +57,7 @@ const App = () => {
   const [numOfPointsPerSet, setnumOfPointsPerSet] = useState(
     querynumOfPointsPerSet ? Number(querynumOfPointsPerSet) : 90
   );
-  const [lib, setLib] = useState(queryLib || "visx");
+  const [lib, setLib] = useState(queryLib || "echarts");
 
   const [datasets, setDatasets] = useState(
     generateData({ numOfDataSets, numOfPointsPerSet })
