@@ -7,13 +7,14 @@ import VisxLineChart from "./charts/VisxLineChart";
 import EchartsLineChart from "./charts/EChartsLineChart";
 import ChartJSLineChart from "./charts/ChartJSLineChart";
 import D3LineChart from "./charts/D3LineChart";
+import { H1 } from "@leafygreen-ui/typography";
 
-const generateData = ({ numOfDataSets, numOfDaysPerSet }) => {
+const generateData = ({ numOfDataSets, numOfPointsPerSet }) => {
   const datasets = [];
   const startDate = new Date(2023, 0, 1);
   for (let j = 0; j < numOfDataSets; j++) {
     const data = [];
-    for (let i = 0; i < numOfDaysPerSet; i++) {
+    for (let i = 0; i < numOfPointsPerSet; i++) {
       data.push({
         x: new Date(startDate.getTime() + i * 24 * 60 * 60 * 1000), // Add i days
         y: Math.floor(Math.random() * 100), // Random y value between 0 and 100
@@ -43,7 +44,7 @@ const App = () => {
 
   const queryNumOfCharts = searchParams.get("numOfCharts");
   const queryNumOfDataSets = searchParams.get("numOfDataSets");
-  const queryNumOfDaysPerSet = searchParams.get("numOfDaysPerSet");
+  const querynumOfPointsPerSet = searchParams.get("numOfPointsPerSet");
   const queryLib = searchParams.get("lib");
 
   const [numOfCharts, setNumOfCharts] = useState(
@@ -52,13 +53,13 @@ const App = () => {
   const [numOfDataSets, setNumOfDataSets] = useState(
     queryNumOfDataSets ? Number(queryNumOfDataSets) : 20
   );
-  const [numOfDaysPerSet, setNumOfDaysPerSet] = useState(
-    queryNumOfDaysPerSet ? Number(queryNumOfDaysPerSet) : 90
+  const [numOfPointsPerSet, setnumOfPointsPerSet] = useState(
+    querynumOfPointsPerSet ? Number(querynumOfPointsPerSet) : 90
   );
   const [lib, setLib] = useState(queryLib || "visx");
 
   const [datasets, setDatasets] = useState(
-    generateData({ numOfDataSets, numOfDaysPerSet })
+    generateData({ numOfDataSets, numOfPointsPerSet })
   );
 
   const libOptions = {
@@ -81,8 +82,8 @@ const App = () => {
   };
 
   useEffect(() => {
-    setDatasets(generateData({ numOfDataSets, numOfDaysPerSet }));
-  }, [numOfCharts, numOfDataSets, numOfDaysPerSet]);
+    setDatasets(generateData({ numOfDataSets, numOfPointsPerSet }));
+  }, [numOfCharts, numOfDataSets, numOfPointsPerSet]);
 
   const updateQueryParams = (key, value) => {
     const params = new URLSearchParams(searchParams);
@@ -106,7 +107,7 @@ const App = () => {
 
   return (
     <div>
-      <h1 style={{ padding: "40px" }}>Chart Performance Comparison</h1>
+      <H1 style={{ padding: "40px" }}>Chart Performance Comparison</H1>
       <form
         style={{ padding: "0 40px 40px", borderBottom: "1px solid white" }}
         onSubmit={(e) => e.preventDefault()}
@@ -181,25 +182,25 @@ const App = () => {
         </div>
         <div style={{ marginBottom: "5px" }}>
           <label
-            for="numOfDaysPerSet"
+            for="numOfPointsPerSet"
             style={{ display: "inline-block", width: "250px" }}
           >
-            Number of days per dataset:
+            Number of points per dataset:
           </label>
           <input
             type="text"
             inputmode="numeric"
             pattern="[0-9]*"
-            defaultValue={numOfDaysPerSet}
+            defaultValue={numOfPointsPerSet}
             onChange={(e) =>
               handleConfigChange(
                 e.currentTarget.value,
-                setNumOfDaysPerSet,
-                "numOfDaysPerSet"
+                setnumOfPointsPerSet,
+                "numOfPointsPerSet"
               )
             }
             style={{ width: "50px" }}
-            id="numOfDaysPerSet"
+            id="numOfPointsPerSet"
           />
         </div>
         <div style={{ marginTop: "32px" }}>
@@ -214,7 +215,9 @@ const App = () => {
               Total Points:
             </span>
             <span>
-              {numberWithCommas(numOfCharts * numOfDataSets * numOfDaysPerSet)}
+              {numberWithCommas(
+                numOfCharts * numOfDataSets * numOfPointsPerSet
+              )}
             </span>
           </p>
         </div>
