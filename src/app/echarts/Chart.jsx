@@ -8,20 +8,19 @@ import ToolTip from "./Tooltip";
 import { generateDatasets } from "./utils";
 import { useSearchParams } from "next/navigation";
 
-function getDatasets() {
-  const datasetCount = 4;
-  const granularityInMinutes = 1; // in minutes
-  const now = new Date();
-  const threeDaysAgo = new Date();
-  threeDaysAgo.setDate(now.getDate() - 3);
+// function getDatasets(granularityInMinutes) {
+//   const datasetCount = 4;
+//   const now = new Date();
+//   const threeDaysAgo = new Date();
+//   threeDaysAgo.setDate(now.getDate() - 3);
 
-  return generateDatasets(
-    datasetCount,
-    granularityInMinutes,
-    threeDaysAgo,
-    now
-  );
-}
+//   return generateDatasets(
+//     datasetCount,
+//     granularityInMinutes,
+//     threeDaysAgo,
+//     now
+//   );
+// }
 
 const colors = [
   "#016BF8",
@@ -41,7 +40,7 @@ const colors = [
   "#B45AF2",
 ];
 
-const Chart = ({ group }) => {
+const Chart = ({ data, group }) => {
   const searchParams = useSearchParams();
   const chartRef = useRef(null);
   const [startDate, setStartDate] = useState(
@@ -54,7 +53,6 @@ const Chart = ({ group }) => {
       ? new Date(searchParams.get("endDate"))
       : undefined
   );
-  const [datasets] = useState(getDatasets());
 
   useEffect(() => {
     setStartDate(new Date(searchParams.get("startDate")));
@@ -64,7 +62,7 @@ const Chart = ({ group }) => {
   useEffect(() => {
     const chartInstance = echarts.init(chartRef.current);
 
-    const series = datasets.map((dataset, index) => ({
+    const series = data.map((dataset, index) => ({
       name: dataset.key,
       type: "line",
       data: dataset.data.map((d) => [d.x, d.y]),
@@ -93,7 +91,7 @@ const Chart = ({ group }) => {
       toolbox: {
         feature: {
           dataZoom: {
-            show: true,
+            show: false,
           },
         },
         right: "20px",
@@ -163,7 +161,7 @@ const Chart = ({ group }) => {
     return () => {
       chartInstance.dispose();
     };
-  }, [datasets, group, startDate, endDate]);
+  }, [data, group, startDate, endDate]);
 
   return (
     <div

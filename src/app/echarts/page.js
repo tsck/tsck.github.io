@@ -6,40 +6,34 @@ import { useSearchParams } from "next/navigation";
 import Chart from "./Chart";
 import ConfigForm from "./ConfigForm";
 import { H1 } from "@leafygreen-ui/typography";
+import { generateDatasets } from "./utils";
 
-const generateData = ({ numOfDataSets, numOfDaysPerSet }) => {
-  const datasets = [];
-  const startDate = new Date(2023, 0, 1);
-  for (let j = 0; j < numOfDataSets; j++) {
-    const data = [];
-    for (let i = 0; i < numOfDaysPerSet; i++) {
-      data.push({
-        x: new Date(startDate.getTime() + i * 24 * 60 * 60 * 1000), // Add i days
-        y: Math.floor(Math.random() * 100), // Random y value between 0 and 100
-      });
-    }
-    datasets.push({ key: `Line ${j + 1}`, data });
-  }
-  return datasets;
-};
+function getDatasets(granularityInMinutes) {
+  const datasetCount = 4;
+  const now = new Date();
+  const threeDaysAgo = new Date();
+  threeDaysAgo.setDate(now.getDate() - 3);
+
+  return generateDatasets(
+    datasetCount,
+    granularityInMinutes,
+    threeDaysAgo,
+    now
+  );
+}
 
 const App = () => {
   const searchParams = useSearchParams();
-  const [numOfCharts, setNumOfCharts] = useState();
-  const [numOfDataSets, setNumOfDataSets] = useState();
-  const [numOfDaysPerSet, setNumOfDaysPerSet] = useState();
-  const [datasets, setDatasets] = useState(
-    generateData({ numOfDataSets, numOfDaysPerSet })
+
+  const [granularity, setGranularity] = useState(
+    Number(searchParams.get("granularity"))
   );
 
-  useEffect(() => {
-    setDatasets(generateData({ numOfDataSets, numOfDaysPerSet }));
-  }, [numOfCharts, numOfDataSets, numOfDaysPerSet]);
+  const numOfCharts = 10;
 
   useEffect(() => {
-    setNumOfCharts(Number(searchParams.get("numOfCharts")));
-    setNumOfDataSets(Number(searchParams.get("numOfDataSets")));
-    setNumOfDaysPerSet(Number(searchParams.get("numOfDaysPerSet")));
+    console.log("granularity", searchParams.get("granularity"));
+    setGranularity(Number(searchParams.get("granularity")));
   }, [searchParams]);
 
   return (
@@ -47,7 +41,7 @@ const App = () => {
       <H1 style={{ padding: "40px" }}>LeafyGreen Charts Demo</H1>
       <ConfigForm />
       {Array.from({ length: numOfCharts }, (_, i) => (
-        <Chart datasets={datasets} key={i} group="chartGroup" />
+        <Chart key={i} group="chartGroup" data={getDatasets(granularity)} />
       ))}
     </div>
   );

@@ -7,6 +7,7 @@ import { NumberInput } from "@leafygreen-ui/number-input";
 /** @jsxImportSource @emotion/react */
 import { css } from "@emotion/react";
 import DateTimePicker from "./DateTimePicker";
+import { Option, Select } from "@leafygreen-ui/select";
 
 const inputStyles = css`
   margin-bottom: 16px;
@@ -24,14 +25,8 @@ const ConfigForm = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const pathname = usePathname();
-  const [numOfCharts, setNumOfCharts] = useState(
-    Number(searchParams.get("numOfCharts")) || 100
-  );
-  const [numOfDataSets, setNumOfDataSets] = useState(
-    Number(searchParams.get("numOfDataSets")) || 20
-  );
-  const [numOfDaysPerSet, setNumOfDaysPerSet] = useState(
-    Number(searchParams.get("numOfDaysPerSet")) || 90
+  const [granularity, setGranularity] = useState(
+    Number(searchParams.get("granularity")) || 1
   );
 
   // Get the current date and time
@@ -69,9 +64,7 @@ const ConfigForm = () => {
 
   useEffect(() => {
     updateQueryParams([
-      ["numOfCharts", numOfCharts],
-      ["numOfDataSets", numOfDataSets],
-      ["numOfDaysPerSet", numOfDaysPerSet],
+      ["granularity", granularity],
       ["startDate", startDate.toISOString()],
       ["endDate", endDate.toISOString()],
     ]);
@@ -82,42 +75,21 @@ const ConfigForm = () => {
       style={{ padding: "0 40px 40px", borderBottom: "1px solid white" }}
       onSubmit={(e) => e.preventDefault()}
     >
-      <NumberInput
-        label="Number of Charts"
-        defaultValue={numOfCharts}
-        onChange={(e) =>
-          handleConfigChange(
-            e.currentTarget.value,
-            setNumOfCharts,
-            "numOfCharts"
-          )
+      <Select
+        label="Granularity"
+        name="granularity"
+        value={granularity}
+        onChange={(value) =>
+          handleConfigChange(value, setGranularity, "granularity")
         }
         css={inputStyles}
-      />
-      <NumberInput
-        label="Number of Datasets Per Chart"
-        defaultValue={numOfDataSets}
-        onChange={(e) =>
-          handleConfigChange(
-            e.currentTarget.value,
-            setNumOfDataSets,
-            "numOfDataSets"
-          )
-        }
-        css={inputStyles}
-      />
-      <NumberInput
-        label="Number of Days Per Dataset"
-        defaultValue={numOfDaysPerSet}
-        onChange={(e) =>
-          handleConfigChange(
-            e.currentTarget.value,
-            setNumOfDaysPerSet,
-            "numOfDaysPerSet"
-          )
-        }
-        css={inputStyles}
-      />
+        dropdownWidthBasis="option"
+      >
+        <Option value={1}>1 minute</Option>
+        <Option value={5}>5 minutes</Option>
+        <Option value={60}>1 hour</Option>
+        <Option value={60 * 24}>1 day</Option>
+      </Select>
       <DateTimePicker
         label="Start"
         value={startDate}
