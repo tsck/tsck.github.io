@@ -3,8 +3,10 @@
 import React, { useEffect, useState } from "react";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { NumberInput } from "@leafygreen-ui/number-input";
+
 /** @jsxImportSource @emotion/react */
 import { css } from "@emotion/react";
+import DateTimePicker from "./DateTimePicker";
 
 const inputStyles = css`
   margin-bottom: 16px;
@@ -16,10 +18,6 @@ function debounce(func, wait) {
     clearTimeout(timeout);
     timeout = setTimeout(() => func.apply(this, args), wait);
   };
-}
-
-function numberWithCommas(x) {
-  return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 }
 
 const ConfigForm = () => {
@@ -36,7 +34,23 @@ const ConfigForm = () => {
     Number(searchParams.get("numOfDaysPerSet")) || 90
   );
 
+  // Get the current date and time
+  const currentDate = new Date();
+  // Subtract 8 hours from the current date and time
+  const [startDate, setStartDate] = useState(
+    new Date(
+      searchParams.get("startDate") ||
+        currentDate.getTime() - 8 * 60 * 60 * 1000
+    )
+  );
+  const [endDate, setEndDate] = useState(
+    searchParams.get("endDate")
+      ? new Date(searchParams.get("endDate"))
+      : currentDate
+  );
+
   const updateQueryParams = (newParams) => {
+    debugger;
     const params = new URLSearchParams(searchParams);
     for (const [key, value] of newParams) {
       if (value) {
@@ -58,6 +72,8 @@ const ConfigForm = () => {
       ["numOfCharts", numOfCharts],
       ["numOfDataSets", numOfDataSets],
       ["numOfDaysPerSet", numOfDaysPerSet],
+      ["startDate", startDate.toISOString()],
+      ["endDate", endDate.toISOString()],
     ]);
   }, []);
 
@@ -102,22 +118,23 @@ const ConfigForm = () => {
         }
         css={inputStyles}
       />
-      {/* <div style={{ marginTop: "32px" }}>
-        <p style={{ marginBottom: "8px" }}>
-          <span style={{ display: "inline-block", width: "250px" }}>
-            Total Lines:
-          </span>
-          <span>{numberWithCommas(numOfCharts * numOfDataSets)}</span>
-        </p>
-        <p style={{ marginBottom: "5px" }}>
-          <span style={{ display: "inline-block", width: "250px" }}>
-            Total Points:
-          </span>
-          <span>
-            {numberWithCommas(numOfCharts * numOfDataSets * numOfDaysPerSet)}
-          </span>
-        </p>
-      </div> */}
+      <DateTimePicker
+        label="Start"
+        value={startDate}
+        onChange={(newDate) => {
+          updateQueryParams([["startDate", newDate.toISOString()]]);
+          setStartDate(newDate);
+        }}
+      />
+      <DateTimePicker
+        label="End"
+        value={endDate}
+        onChange={(newDate) => {
+          console.log(newDate.toISOString());
+          updateQueryParams([["endDate", newDate.toISOString()]]);
+          setEndDate(newDate);
+        }}
+      />
     </form>
   );
 };

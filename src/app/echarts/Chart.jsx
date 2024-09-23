@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { renderToString } from "react-dom/server";
 
 import * as echarts from "echarts";
@@ -6,44 +6,60 @@ import { palette } from "@leafygreen-ui/palette";
 import { borderRadius } from "@leafygreen-ui/tokens";
 import ToolTip from "./Tooltip";
 import { generateDatasets } from "./utils";
+import { useSearchParams } from "next/navigation";
+
+function getDatasets() {
+  const datasetCount = 4;
+  const granularityInMinutes = 1; // in minutes
+  const now = new Date();
+  const threeDaysAgo = new Date();
+  threeDaysAgo.setDate(now.getDate() - 3);
+
+  return generateDatasets(
+    datasetCount,
+    granularityInMinutes,
+    threeDaysAgo,
+    now
+  );
+}
+
+const colors = [
+  "#016BF8",
+  "#00A35C",
+  "#FFC010",
+  "#DB3030",
+  "#5E0C9E",
+  "#1254B7",
+  "#00684A",
+  "#944F01",
+  "#970606",
+  "#2D0B59",
+  "#0498EC",
+  "#00ED64",
+  "#FFEC9E",
+  "#FF6960",
+  "#B45AF2",
+];
 
 const Chart = ({ group }) => {
+  const searchParams = useSearchParams();
   const chartRef = useRef(null);
-
-  const datasetCount = 4;
-  const granularity = 1; // in minutes
-  const hours = 8;
-
-  const baseValues = Array.from(
-    { length: datasetCount },
-    (_, i) => 50 * (i + 1)
+  const [startDate, setStartDate] = useState(
+    searchParams.get("startDate")
+      ? new Date(searchParams.get("startDate"))
+      : undefined
   );
-  const ranges = Array.from({ length: datasetCount }, (_, i) => 5 * (i + 1));
-  const datasets = generateDatasets(
-    datasetCount,
-    baseValues,
-    ranges,
-    granularity,
-    hours
+  const [endDate, setEndDate] = useState(
+    searchParams.get("endDate")
+      ? new Date(searchParams.get("endDate"))
+      : undefined
   );
+  const [datasets] = useState(getDatasets());
 
-  const colors = [
-    "#016BF8",
-    "#00A35C",
-    "#FFC010",
-    "#DB3030",
-    "#5E0C9E",
-    "#1254B7",
-    "#00684A",
-    "#944F01",
-    "#970606",
-    "#2D0B59",
-    "#0498EC",
-    "#00ED64",
-    "#FFEC9E",
-    "#FF6960",
-    "#B45AF2",
-  ];
+  useEffect(() => {
+    setStartDate(new Date(searchParams.get("startDate")));
+    setEndDate(new Date(searchParams.get("endDate")));
+  }, [searchParams]);
 
   useEffect(() => {
     const chartInstance = echarts.init(chartRef.current);
@@ -64,6 +80,15 @@ const Chart = ({ group }) => {
     }));
 
     const option = {
+      title: {
+        show: true,
+        text: "Echarts Line Chart",
+        padding: 20,
+        textStyle: {
+          color: palette.black,
+          fontFamily: "Euclid Circular A Light, sans-serif",
+        },
+      },
       color: colors,
       toolbox: {
         feature: {
@@ -96,6 +121,8 @@ const Chart = ({ group }) => {
         axisTick: {
           show: false,
         },
+        min: startDate, // Specify the start value for the x-axis
+        max: endDate, // Specify the end value for the x-axis
       },
       yAxis: {
         type: "value",
@@ -117,7 +144,7 @@ const Chart = ({ group }) => {
       grid: {
         left: "20px",
         right: "20px",
-        top: "50px",
+        top: "64px",
         bottom: "20px",
         containLabel: true,
         show: true,
@@ -128,23 +155,25 @@ const Chart = ({ group }) => {
     chartInstance.setOption(option);
 
     chartInstance.on("dataZoom", (params) => {
-      const { startValue: xStart, endValue: xEnd } = params.batch[0];
-      const { startValue: yStart, endValue: yEnd } = params.batch[1];
+      // const { startValue: xStart, endValue: xEnd } = params.batch[0];
+      // const { startValue: yStart, endValue: yEnd } = params.batch[1];
       // Handle updated zoom values
     });
 
     return () => {
       chartInstance.dispose();
     };
-  }, [datasets, group]);
+  }, [datasets, group, startDate, endDate]);
 
   return (
     <div
       ref={chartRef}
       className="echart"
       style={{
-        width: "calc(100% - 20px)",
         height: "316px",
+        border: "1px solid #e0e0e0",
+        margin: "20px",
+        borderRadius: borderRadius[200],
       }}
     />
   );

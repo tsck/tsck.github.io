@@ -1,42 +1,65 @@
-export const generateDatasets = (
-  count,
-  baseValues,
-  ranges,
-  granularity,
-  hours
+export const generateDataset = (
+  baseValue,
+  range,
+  granularityInMinutes,
+  startDate,
+  endDate
 ) => {
-  const now = new Date();
-  const startTime = new Date(now.getTime() - hours * 60 * 60 * 1000);
-  const datasets = Array.from({ length: count }, (_, i) => ({
-    key: `Dataset ${i + 1}`,
+  const dataset = {
+    key: `Dataset`,
     data: [],
-    baseValue: baseValues[i],
-    range: ranges[i],
-  }));
+    baseValue: baseValue,
+    range: range,
+  };
 
   for (
-    let time = startTime;
-    time <= now;
-    time.setMinutes(time.getMinutes() + granularity)
+    let time = new Date(startDate);
+    time <= new Date(endDate);
+    time.setMinutes(time.getMinutes() + granularityInMinutes)
   ) {
-    datasets.forEach((dataset) => {
-      // Small random change
-      dataset.baseValue += (Math.random() - 0.5) * dataset.range;
+    // Small random change
+    dataset.baseValue += (Math.random() - 0.5) * dataset.range;
 
-      // Occasional spike or dip
-      if (Math.random() < 0.05) {
-        dataset.baseValue += (Math.random() - 0.5) * dataset.range * 10;
-      }
+    // Occasional spike or dip
+    if (Math.random() < 0.05) {
+      dataset.baseValue += (Math.random() - 0.5) * dataset.range * 10;
+    }
 
-      // Ensure the value stays within a reasonable range
-      dataset.baseValue = Math.max(0, dataset.baseValue);
+    // Ensure the value stays within a reasonable range
+    dataset.baseValue = Math.max(0, dataset.baseValue);
 
-      dataset.data.push({
-        x: new Date(time), // Ensure a new Date object is created
-        y: dataset.baseValue,
-      });
+    dataset.data.push({
+      x: new Date(time), // Ensure a new Date object is created
+      y: dataset.baseValue,
     });
   }
+
+  return dataset;
+};
+
+export const generateDatasets = (
+  count,
+  granularityInMinutes,
+  startDate,
+  endDate
+) => {
+  const baseValues = Array.from({ length: count }, (_, i) => 50 * (i + 1));
+  const ranges = Array.from({ length: count }, (_, i) => 5 * (i + 1));
+
+  const datasets = Array.from({ length: count }, (_, i) =>
+    generateDataset(
+      baseValues[i],
+      ranges[i],
+      granularityInMinutes,
+      startDate,
+      endDate
+    )
+  );
+
+  // Assign unique keys to each dataset
+  datasets.forEach((dataset, index) => {
+    dataset.key = `Dataset ${index + 1}`;
+  });
 
   return datasets;
 };
