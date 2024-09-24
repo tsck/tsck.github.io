@@ -7,6 +7,62 @@ import { borderRadius, spacing } from "@leafygreen-ui/tokens";
 import ToolTip from "./Tooltip";
 import { useSearchParams } from "next/navigation";
 
+const getThresholdConfig = (label) => ({
+  lineStyle: {
+    color: palette.red.base,
+    type: "dashed",
+    width: 1,
+  },
+  label: {
+    formatter: ``,
+    position: "insideEndBottom",
+    distance: [-16, 10],
+  },
+  emphasis: {
+    label: {
+      formatter: label,
+      backgroundColor: "#001E2B",
+      borderRadius: borderRadius[150],
+      color: "white",
+      padding: spacing[400],
+    },
+    lineStyle: {
+      width: 1,
+    },
+  },
+  symbol: "triangle",
+  symbolSize: [0, 12],
+  symbolRotate: 90,
+});
+
+const getEventMarkerConfig = (label) => ({
+  lineStyle: {
+    color: palette.red.base,
+    type: "solid",
+    width: 1,
+  },
+  label: {
+    formatter: ``,
+    position: "insideEndBottom",
+    distance: [-16, 10],
+  },
+  emphasis: {
+    label: {
+      formatter: label,
+      backgroundColor: "#001E2B",
+      borderRadius: borderRadius[150],
+      color: "white",
+      padding: spacing[400],
+    },
+    lineStyle: {
+      width: 1,
+    },
+  },
+  // symbolSize: [0, 12],
+  symbol: "triangle",
+  symbolRotate: 90,
+});
+
 const colors = [
   "#016BF8",
   "#00A35C",
@@ -28,16 +84,17 @@ const colors = [
 const Chart = ({ data, group, label }) => {
   const searchParams = useSearchParams();
   const chartRef = useRef(null);
-  const [startDate, setStartDate] = useState(
-    searchParams.get("startDate")
-      ? new Date(searchParams.get("startDate"))
-      : undefined
-  );
-  const [endDate, setEndDate] = useState(
-    searchParams.get("endDate")
-      ? new Date(searchParams.get("endDate"))
-      : undefined
-  );
+
+  const defaultStartDate = searchParams.get("startDate")
+    ? new Date(searchParams.get("startDate"))
+    : undefined;
+
+  const defaultEndDate = searchParams.get("endDate")
+    ? new Date(searchParams.get("endDate"))
+    : undefined;
+
+  const [startDate, setStartDate] = useState(defaultStartDate);
+  const [endDate, setEndDate] = useState(defaultEndDate);
 
   useEffect(() => {
     setStartDate(new Date(searchParams.get("startDate")));
@@ -63,44 +120,23 @@ const Chart = ({ data, group, label }) => {
         symbolSize: 1,
       },
       clip: false,
-      markLine: {
-        data: [
-          {
-            yAxis: 600,
-            label: {
-              formatter: ``,
-            },
-            emphasis: {
-              label: {
-                formatter: `Max Storage Limit`,
-              },
-            },
-          },
-        ],
-        lineStyle: {
-          color: "red",
-          type: "dashed",
-          width: 1,
-        },
-        label: {
-          position: "insideEndBottom",
-          distance: [-16, 10],
-        },
-        emphasis: {
-          label: {
-            backgroundColor: "#001E2B",
-            borderRadius: borderRadius[150],
-            color: "white",
-            padding: spacing[400],
-          },
-          lineStyle: {
-            width: 1,
-          },
-        },
-        symbol: ["none", "triangle"],
-        symbolSize: 12,
-        symbolRotate: 90,
-      },
+
+      // TODO: Figure out - not working right.
+      // markLine: {
+      //   data: [
+      //     {
+      //       yAxis: 600,
+      //       ...getThresholdConfig("Threshold 1"),
+      //     },
+      //     {
+      //       xAxis: new Date(Date.now() - 2 * 60 * 60 * 1000), // 2 hours ago
+      //       ...getEventMarkerConfig("Event Marker"),
+      //     },
+      //   ],
+      //   // symbol: ["triangle", "triangle"],
+      //   // symbolSize: [12, 12],
+      //   // symbolRotate: 180,
+      // },
     }));
 
     const option = {
@@ -115,12 +151,18 @@ const Chart = ({ data, group, label }) => {
       },
       color: colors,
       toolbox: {
+        orient: "vertical",
+        itemSize: 13,
+        top: 15,
+        right: -6,
         feature: {
           dataZoom: {
-            show: false,
+            icon: {
+              zoom: "path://", // hack to remove zoom button
+              back: "path://", // hack to remove restore button
+            },
           },
         },
-        right: "20px",
       },
       tooltip: {
         trigger: "axis",
@@ -145,8 +187,6 @@ const Chart = ({ data, group, label }) => {
         axisTick: {
           show: false,
         },
-        min: startDate, // Specify the start value for the x-axis
-        max: endDate, // Specify the end value for the x-axis
       },
       yAxis: {
         type: "value",
@@ -178,9 +218,27 @@ const Chart = ({ data, group, label }) => {
 
     chartInstance.setOption(option);
 
+    // Set the global cursor to dataZoomSelect to enable zooming
+    chartInstance.dispatchAction({
+      type: "takeGlobalCursor",
+      key: "dataZoomSelect",
+      dataZoomSelectActive: true,
+    });
+
+    // Set the initial zoom range
+    chartInstance.dispatchAction({
+      type: "dataZoom",
+      startValue: startDate,
+      endValue: endDate,
+    });
+
     chartInstance.on("dataZoom", (params) => {
-      // const { startValue: xStart, endValue: xEnd } = params.batch[0];
-      // const { startValue: yStart, endValue: yEnd } = params.batch[1];
+      const { startValue: xStart, endValue: xEnd } = params.batch[0];
+      const { startValue: yStart, endValue: yEnd } = params.batch[1];
+
+      console.log(params.batch[0]);
+      console.log("Start:", new Date(Math.round(xStart)));
+      console.log("End:", new Date(Math.round(xEnd)));
       // Handle updated zoom values
     });
 
@@ -190,16 +248,26 @@ const Chart = ({ data, group, label }) => {
   }, [data, group, startDate, endDate]);
 
   return (
-    <div
-      ref={chartRef}
-      className="echart"
-      style={{
-        height: "316px",
-        border: "1px solid #e0e0e0",
-        margin: "20px",
-        borderRadius: borderRadius[200],
-      }}
-    />
+    <>
+      <button
+        onClick={() => {
+          setStartDate(defaultStartDate);
+          setEndDate(defaultEndDate);
+        }}
+      >
+        Reset
+      </button>
+      <div
+        ref={chartRef}
+        className="echart"
+        style={{
+          height: "316px",
+          border: "1px solid #e0e0e0",
+          margin: "20px",
+          borderRadius: borderRadius[200],
+        }}
+      />
+    </>
   );
 };
 
