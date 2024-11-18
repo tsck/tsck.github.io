@@ -2,12 +2,14 @@
 
 import React, { useEffect, useState } from "react";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
-import { NumberInput } from "@leafygreen-ui/number-input";
 
 /** @jsxImportSource @emotion/react */
 import { css } from "@emotion/react";
 import DateTimePicker from "./DateTimePicker";
 import { Option, Select } from "@leafygreen-ui/select";
+import { useChartSyncContext } from "./ChartSyncProvider";
+import { DatePicker } from "@leafygreen-ui/date-picker";
+import { spacing } from "@leafygreen-ui/tokens";
 
 const inputStyles = css`
   margin-bottom: 16px;
@@ -22,6 +24,8 @@ function debounce(func, wait) {
 }
 
 const ConfigForm = () => {
+  const syncContext = useChartSyncContext();
+  console.log(syncContext);
   const router = useRouter();
   const searchParams = useSearchParams();
   const pathname = usePathname();
@@ -116,4 +120,33 @@ const ConfigForm = () => {
   );
 };
 
-export default ConfigForm;
+function DateRangeSelector() {
+  const { xAxis, updateConfig } = useChartSyncContext();
+
+  return (
+    <form style={{ margin: "20px", width: "92%" }}>
+      <DatePicker
+        label="Start"
+        value={xAxis.min}
+        onDateChange={(newDate) =>
+          updateConfig({ xAxis: { ...xAxis, min: newDate } })
+        }
+        // locale="iso8601"
+        // timeZone="utc"
+        style={{ marginBottom: "16px" }}
+      />
+      <DatePicker
+        label="End"
+        value={xAxis.max}
+        onDateChange={(newDate) =>
+          updateConfig({ xAxis: { ...xAxis, max: newDate } })
+        }
+        // locale="iso8601"
+        // timeZone="utc"
+        // style={{ marginBottom: "16px" }}
+      />
+    </form>
+  );
+}
+
+export default DateRangeSelector;

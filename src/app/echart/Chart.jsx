@@ -6,6 +6,7 @@ import { palette } from "@leafygreen-ui/palette";
 import { borderRadius, spacing } from "@leafygreen-ui/tokens";
 import ToolTip from "./Tooltip";
 import { useSearchParams } from "next/navigation";
+import { useChartSyncContext } from "./ChartSyncProvider";
 
 const getThresholdConfig = (label) => ({
   lineStyle: {
@@ -58,7 +59,6 @@ const getEventMarkerConfig = (label) => ({
       width: 1,
     },
   },
-  // symbolSize: [0, 12],
   symbol: "triangle",
   symbolRotate: 90,
 });
@@ -81,65 +81,42 @@ const colors = [
   "#B45AF2",
 ];
 
-const Chart = ({ data, group, label }) => {
-  const searchParams = useSearchParams();
+const populateSeries = (seriesConfig) => ({
+  type: "line",
+  showSymbol: false,
+  emphasis: {
+    itemStyle: {
+      // color: dataset.color,
+      // borderWidth: 5,
+    },
+    symbol: "circle",
+    symbolSize: 1,
+  },
+  clip: false,
+  ...seriesConfig,
+});
+
+const Chart = (props) => {
+  const syncContext = useChartSyncContext();
+
+  const series = props.series || syncContext.series;
+  const xAxis = props.xAxis || syncContext.xAxis;
+  const yAxis = props.yAxis || syncContext.yAxis;
+  const label = props.label || syncContext.label;
+  const group = syncContext.group;
+
   const chartRef = useRef(null);
-
-  const defaultStartDate = searchParams.get("startDate")
-    ? new Date(searchParams.get("startDate"))
-    : undefined;
-
-  const defaultEndDate = searchParams.get("endDate")
-    ? new Date(searchParams.get("endDate"))
-    : undefined;
-
-  const [startDate, setStartDate] = useState(defaultStartDate);
-  const [endDate, setEndDate] = useState(defaultEndDate);
+  const chartInstanceRef = useRef(null);
 
   useEffect(() => {
-    setStartDate(new Date(searchParams.get("startDate")));
-    setEndDate(new Date(searchParams.get("endDate")));
-  }, [searchParams]);
-
-  useEffect(() => {
-    if (!data) return;
+    if (!series) return;
 
     const chartInstance = echarts.init(chartRef.current);
-
-    const series = data.map((dataset, index) => ({
-      name: dataset.key,
-      type: "line",
-      data: dataset.data.map((d) => [d.x, d.y]),
-      showSymbol: false,
-      emphasis: {
-        itemStyle: {
-          color: dataset.color,
-          borderWidth: 5,
-        },
-        symbol: "circle",
-        symbolSize: 1,
-      },
-      clip: false,
-
-      // TODO: Figure out - not working right.
-      // markLine: {
-      //   data: [
-      //     {
-      //       yAxis: 600,
-      //       ...getThresholdConfig("Threshold 1"),
-      //     },
-      //     {
-      //       xAxis: new Date(Date.now() - 2 * 60 * 60 * 1000), // 2 hours ago
-      //       ...getEventMarkerConfig("Event Marker"),
-      //     },
-      //   ],
-      //   // symbol: ["triangle", "triangle"],
-      //   // symbolSize: [12, 12],
-      //   // symbolRotate: 180,
-      // },
-    }));
+    chartInstanceRef.current = chartInstance;
+    chartInstance.group = group;
 
     const option = {
+      series: series.map(populateSeries),
       title: {
         show: true,
         text: label,
@@ -172,7 +149,6 @@ const Chart = ({ data, group, label }) => {
         formatter: (params) => renderToString(<ToolTip params={params} />),
       },
       xAxis: {
-        type: "time",
         splitLine: { show: true },
         axisLine: {
           lineStyle: {
@@ -187,9 +163,9 @@ const Chart = ({ data, group, label }) => {
         axisTick: {
           show: false,
         },
+        ...xAxis,
       },
       yAxis: {
-        type: "value",
         splitLine: { show: true },
         axisLine: {
           lineStyle: {
@@ -204,6 +180,7 @@ const Chart = ({ data, group, label }) => {
         axisTick: {
           show: false,
         },
+        ...yAxis,
       },
       grid: {
         left: spacing[1000],
@@ -213,7 +190,6 @@ const Chart = ({ data, group, label }) => {
         containLabel: true,
         show: true,
       },
-      series,
     };
 
     chartInstance.setOption(option);
@@ -225,38 +201,41 @@ const Chart = ({ data, group, label }) => {
       dataZoomSelectActive: true,
     });
 
-    // Set the initial zoom range
-    chartInstance.dispatchAction({
-      type: "dataZoom",
-      startValue: startDate,
-      endValue: endDate,
-    });
-
     chartInstance.on("dataZoom", (params) => {
-      const { startValue: xStart, endValue: xEnd } = params.batch[0];
-      const { startValue: yStart, endValue: yEnd } = params.batch[1];
-
-      console.log(params.batch[0]);
-      console.log("Start:", new Date(Math.round(xStart)));
-      console.log("End:", new Date(Math.round(xEnd)));
-      // Handle updated zoom values
+      console.log(params);
     });
+
+    const handleResize = () => {
+      chartInstance.resize();
+    };
+
+    window.addEventListener("resize", handleResize);
 
     return () => {
+      window.removeEventListener("resize", handleResize);
       chartInstance.dispose();
     };
-  }, [data, group, startDate, endDate]);
+  }, [series, group]);
+
+  // useEffect(() => {
+  //   if (!isZoomed) {
+  //     chartInstanceRef.current.dispatchAction({
+  //       type: "dataZoom",
+  //       start: 0,
+  //       end: 100,
+  //     });
+  //   }
+  // }, []);
 
   return (
-    <>
-      <button
+    <div style={{ width: "100%" }}>
+      {/* <button
         onClick={() => {
-          setStartDate(defaultStartDate);
-          setEndDate(defaultEndDate);
+          // setIsZoomed(false);
         }}
       >
         Reset
-      </button>
+      </button> */}
       <div
         ref={chartRef}
         className="echart"
@@ -267,7 +246,7 @@ const Chart = ({ data, group, label }) => {
           borderRadius: borderRadius[200],
         }}
       />
-    </>
+    </div>
   );
 };
 
